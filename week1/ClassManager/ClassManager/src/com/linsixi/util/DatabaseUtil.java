@@ -1,19 +1,42 @@
 package com.linsixi.util;
 
+import com.alibaba.druid.pool.DruidDataSource;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class DatabaseUtil {
-    private static final String URL = "jdbc:mysql://localhost:3306/classmanager?useServerPrepStmts=true";
-    private static final String USER = "root";
-    private static final String PASSWORD = "qq1205631050";
+    private static final DruidDataSource dataSource;
+
+    static {
+        dataSource = new DruidDataSource();
+        Properties properties = new Properties();
+        try (InputStream inputStream = DatabaseUtil.class.getClassLoader().getResourceAsStream("theDruid.properties")) {
+            if (inputStream == null) {
+                throw new IOException("theDruid.properties file not found!");
+            }
+            properties.load(inputStream);
+            dataSource.setDriverClassName(properties.getProperty("driverClassName"));
+            dataSource.setUrl(properties.getProperty("url"));
+            dataSource.setUsername(properties.getProperty("username"));
+            dataSource.setPassword(properties.getProperty("password"));
+            dataSource.setInitialSize(Integer.parseInt(properties.getProperty("initialSize")));
+            dataSource.setMinIdle(Integer.parseInt(properties.getProperty("minIdle")));
+            dataSource.setMaxActive(Integer.parseInt(properties.getProperty("maxActive")));
+            dataSource.setMaxWait(Long.parseLong(properties.getProperty("maxWait")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     // 获取数据库连接
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        return dataSource.getConnection();
     }
 
     // 释放资源
