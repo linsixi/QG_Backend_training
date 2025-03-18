@@ -1,0 +1,8 @@
+DELETE FROM student_courses;
+DELETE FROM courses;
+DELETE FROM students;
+DELETE FROM users;
+ALTER TABLE users AUTO_INCREMENT = 1;
+ALTER TABLE students AUTO_INCREMENT = 1;
+ALTER TABLE courses AUTO_INCREMENT = 1;
+ALTER TABLE student_courses AUTO_INCREMENT = 1;
